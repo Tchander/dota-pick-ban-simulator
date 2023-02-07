@@ -9,3 +9,10 @@ export enum HeroesRoles {
   PUSHER = 'Pusher',
   SUPPORT = 'Support',
 }
+
+export enum HeroesPrimaryAttribute {
+  STRENGTH = 'str',
+  AGILITY = 'agi',
+  INTELLIGENCE = 'int',
+}
+
