@@ -34,9 +34,7 @@ onMounted(() => {
 }
 
 .hero {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 700;
+  @include font(16, 20, 700);
   display: flex;
   flex-direction: column;
   gap: 8px;
