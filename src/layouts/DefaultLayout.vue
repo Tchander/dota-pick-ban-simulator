@@ -18,7 +18,7 @@
   overflow: hidden;
   min-height: 100vh;
   font-family: sans-serif;
-  color: #fff;
+  color: $white;
   background: #2e3032;
 }
 </style>
