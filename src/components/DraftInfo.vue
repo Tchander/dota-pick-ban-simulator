@@ -1,0 +1,25 @@
+<template>
+  <div class="draft-info">
+    <draft-list class="draft-list" :player="playerStore.player1" />
+    <draft-list class="draft-list" :player="playerStore.player2" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import DraftList from '@/components/DraftList.vue';
+import { usePlayerStore } from '@/stores/player';
+
+const playerStore = usePlayerStore();
+</script>
+
+<style lang="scss" scoped>
+.draft-info {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+}
+
+.draft-list {
+  width: 50%;
+}
+</style>

@@ -1,4 +1,4 @@
-import { IHeroes } from '@/types';
+import { IHero } from '@/types';
 import { HeroesPrimaryAttribute, HeroesRoles } from '@/enum/heroes';
 
 export const ATTRIBUTE_TITLE_MAPPER = {
@@ -7,7 +7,7 @@ export const ATTRIBUTE_TITLE_MAPPER = {
   [HeroesPrimaryAttribute.INTELLIGENCE]: 'Intelligence',
 };
 
-export const HEROES: IHeroes[] = [
+export const HEROES: IHero[] = [
   {
     id: 1,
     name: 'npc_dota_hero_antimage',

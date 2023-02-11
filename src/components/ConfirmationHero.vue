@@ -8,18 +8,60 @@
         :alt="props.selectedHero.localized_name"
       />
     </div>
-    <div class="confirmation-button">SUGGEST</div>
+    <div class="confirmation-button-wrapper">
+      <div class="confirmation-button confirmation-button-pick" @click="confirmHeroPick">
+        PICK
+      </div>
+      <div class="confirmation-button confirmation-button-ban" @click="confirmHeroBan">
+        BAN
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { IHeroes } from '@/types';
+import { reactive } from 'vue';
+import { IHero } from '@/types';
+import { useHeroesStore } from '@/stores/heroes';
+import { usePlayerStore } from '@/stores/player';
+import { EmitEvents } from '@/enum/emits';
+
+const heroesStore = useHeroesStore();
+const playerStore = usePlayerStore();
+
+const emit = defineEmits<{
+  (e: EmitEvents.RESET): void;
+}>();
 
 interface Props {
-  selectedHero: IHeroes | null;
+  selectedHero: IHero;
 }
 
 const props = defineProps<Props>();
+
+interface State {
+  currentPickNumber: number;
+  currentBanNumber: number;
+}
+
+const state = reactive<State>({
+  currentPickNumber: 0,
+  currentBanNumber: 0,
+});
+
+const confirmHeroPick = () => {
+  heroesStore.heroPicked(props.selectedHero);
+  playerStore.pickHero(props.selectedHero, playerStore.player1, state.currentPickNumber);
+  state.currentPickNumber++;
+  emit(EmitEvents.RESET);
+};
+
+const confirmHeroBan = () => {
+  heroesStore.heroBanned(props.selectedHero);
+  playerStore.banHero(props.selectedHero, playerStore.player1, state.currentBanNumber);
+  state.currentBanNumber++;
+  emit(EmitEvents.RESET);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -27,39 +69,44 @@ const props = defineProps<Props>();
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: rgba(#222330, 0.5);
-  border: 1px solid #222330;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px 0 #222330;
-  padding: 16px;
+  background-color: rgba($dark-blue, 0.5);
+  border: 1px solid $dark-blue;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 1.25rem 0 $dark-blue;
+  padding: 1rem;
 }
 
 .confirmation-image-wrapper {
-  border: 1px solid #222330;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px 0 #222330;
-  height: 100%;
-  max-height: 196px;
+  border: 1px solid $dark-blue;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 1.25rem 0 $dark-blue;
+  height: 9.3125rem;
 }
 
 .confirmation-image {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 0.5rem;
+}
+
+.confirmation-button-wrapper {
+  display: flex;
+  gap: 20px;
 }
 
 .confirmation-button {
-  @include font(20, 28, 700);
-  padding: 16px;
-  background-color: #3e3e48;
-  color: #d9d9d9;
-  border: 1px solid #222330;
-  border-radius: 8px;
+  @include font(1.25, 1.75, 700);
+  padding: 1rem;
+  width: 100%;
+  background-color: $dark-blue;
+  color: $light-grey;
+  border: 1px solid $dark-blue;
+  border-radius: 0.5rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 
   &:hover {
-    background-color: #222330;
+    background-color: $dark-blue;
   }
 }
 </style>
