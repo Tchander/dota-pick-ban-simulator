@@ -1,7 +1,7 @@
 <template>
   <div class="draft-info">
-    <draft-list class="draft-list" :player="playerStore.player1" />
-    <draft-list class="draft-list" :player="playerStore.player2" />
+    <draft-list class="draft-list" :player="playerStore.radiantPlayer" />
+    <draft-list class="draft-list" :player="playerStore.direPlayer" />
   </div>
 </template>
 

@@ -35,10 +35,12 @@ import { HeroesPrimaryAttribute } from '@/enum/heroes';
 
 interface State {
   selectedHero: IHero | null;
+  isRadiantPickFirst: boolean;
 }
 
 const state = reactive<State>({
   selectedHero: null,
+  isRadiantPickFirst: true,
 });
 
 const heroesStore = useHeroesStore();
@@ -68,6 +70,8 @@ const changeSelectedHero = (hero: IHero) => {
 const resetSelectedHero = () => {
   state.selectedHero = null;
 };
+
+const startGame = () => {};
 
 const init = () => {
   playerStore.setNumberOfPickedHeroes();

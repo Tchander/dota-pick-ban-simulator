@@ -2,10 +2,13 @@
   <div class="confirmation">
     <div class="confirmation-image-wrapper">
       <img
-        v-if="props.selectedHero"
         class="confirmation-image"
-        :src="require(`@/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`)"
-        :alt="props.selectedHero.localized_name"
+        :src="
+          props.selectedHero
+            ? require(`@/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`)
+            : require('@/assets/imgs/heroes/dota-placeholder.jpg')
+        "
+        :alt="props.selectedHero ? props.selectedHero.localized_name : 'placeholder'"
       />
     </div>
     <div class="confirmation-button-wrapper">
@@ -51,14 +54,22 @@ const state = reactive<State>({
 
 const confirmHeroPick = () => {
   heroesStore.heroPicked(props.selectedHero);
-  playerStore.pickHero(props.selectedHero, playerStore.player1, state.currentPickNumber);
+  playerStore.pickHero(
+    props.selectedHero,
+    playerStore.radiantPlayer,
+    state.currentPickNumber,
+  );
   state.currentPickNumber++;
   emit(EmitEvents.RESET);
 };
 
 const confirmHeroBan = () => {
   heroesStore.heroBanned(props.selectedHero);
-  playerStore.banHero(props.selectedHero, playerStore.player1, state.currentBanNumber);
+  playerStore.banHero(
+    props.selectedHero,
+    playerStore.radiantPlayer,
+    state.currentBanNumber,
+  );
   state.currentBanNumber++;
   emit(EmitEvents.RESET);
 };

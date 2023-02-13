@@ -2,16 +2,19 @@ import { defineStore } from 'pinia';
 import { IPlayer, IPlayerState } from '@/types/player';
 import { StoreId } from '@/enum/stores';
 import { IHero } from '@/types';
+import { DEFAULT_NUMBER_OF_BANS, DEFAULT_NUMBER_OF_PICKS } from '@/constants/numbers';
 
 export const usePlayerStore = defineStore(StoreId.PLAYER, {
   state: (): IPlayerState => ({
-    player1: {
+    radiantPlayer: {
       id: 1,
+      name: 'Radiant',
       pickedHeroes: [],
       bannedHeroes: [],
     },
-    player2: {
+    direPlayer: {
       id: 2,
+      name: 'Dire',
       pickedHeroes: [],
       bannedHeroes: [],
     },
@@ -21,34 +24,34 @@ export const usePlayerStore = defineStore(StoreId.PLAYER, {
 
   actions: {
     pickHero(hero: IHero, player: IPlayer, currentPickNumber: number) {
-      if (player.id === this.player1.id) {
-        this.player1.pickedHeroes[currentPickNumber] = hero;
+      if (player.id === this.radiantPlayer.id) {
+        this.radiantPlayer.pickedHeroes[currentPickNumber] = hero;
       }
-      if (player.id === this.player2.id) {
-        this.player2.pickedHeroes[currentPickNumber] = hero;
+      if (player.id === this.direPlayer.id) {
+        this.direPlayer.pickedHeroes[currentPickNumber] = hero;
       }
     },
 
     banHero(hero: IHero, player: IPlayer, currentBanNumber: number) {
-      if (player.id === this.player1.id) {
-        this.player1.bannedHeroes[currentBanNumber] = hero;
+      if (player.id === this.radiantPlayer.id) {
+        this.radiantPlayer.bannedHeroes[currentBanNumber] = hero;
       }
-      if (player.id === this.player2.id) {
-        this.player2.bannedHeroes[currentBanNumber] = hero;
-      }
-    },
-
-    setNumberOfPickedHeroes(n: number = 5) {
-      for (let i = 0; i < n; i++) {
-        this.player1.pickedHeroes.push(null);
-        this.player2.pickedHeroes.push(null);
+      if (player.id === this.direPlayer.id) {
+        this.direPlayer.bannedHeroes[currentBanNumber] = hero;
       }
     },
 
-    setNumberOfBannedHeroes(n: number = 7) {
+    setNumberOfPickedHeroes(n: number = DEFAULT_NUMBER_OF_PICKS) {
       for (let i = 0; i < n; i++) {
-        this.player1.bannedHeroes.push(null);
-        this.player2.bannedHeroes.push(null);
+        this.radiantPlayer.pickedHeroes.push(null);
+        this.direPlayer.pickedHeroes.push(null);
+      }
+    },
+
+    setNumberOfBannedHeroes(n: number = DEFAULT_NUMBER_OF_BANS) {
+      for (let i = 0; i < n; i++) {
+        this.radiantPlayer.bannedHeroes.push(null);
+        this.direPlayer.bannedHeroes.push(null);
       }
     },
   },

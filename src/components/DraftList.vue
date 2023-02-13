@@ -1,5 +1,9 @@
 <template>
   <div class="draft">
+    <div class="draft-top-block">
+      <div class="draft-player-name">{{ props.player.name }}</div>
+      <div class="draft-timer"></div>
+    </div>
     <div class="draft-wrapper">
       <div
         v-for="(hero, index) in props.player.pickedHeroes"
@@ -7,12 +11,14 @@
         class="draft-hero-pick"
       >
         <img
-          v-if="hero"
-          :src="require(`@/assets/imgs/heroes/${hero.localized_name}.webp`)"
-          :alt="hero.localized_name"
+          :src="
+            hero
+              ? require(`@/assets/imgs/heroes/${hero.localized_name}.webp`)
+              : require('@/assets/imgs/heroes/dota-placeholder.jpg')
+          "
+          :alt="hero ? hero.localized_name : 'placeholder'"
           class="draft-hero-img draft-hero-img_pick"
         />
-        <div v-else class="draft-hero-empty" />
       </div>
     </div>
     <div class="draft-wrapper">
@@ -30,7 +36,12 @@
           />
           <div class="draft-crossed-ban-line" />
         </template>
-        <div v-else class="draft-hero-empty" />
+        <img
+          v-else
+          :src="require('@/assets/imgs/heroes/dota-placeholder.jpg')"
+          :alt="'placeholder'"
+          class="draft-hero-img draft-hero-img_ban"
+        />
       </div>
     </div>
   </div>
@@ -56,6 +67,16 @@ const props = defineProps<Props>();
   border-radius: 0.5rem;
 }
 
+.draft-top-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.draft-player-name {
+  @include font(2, 3, 700);
+}
+
 .draft-wrapper {
   display: flex;
   gap: 1rem;
@@ -64,6 +85,7 @@ const props = defineProps<Props>();
 .draft-hero-pick {
   width: 20%;
   height: 5.5625rem;
+  box-shadow: 0 0.25rem 1.25rem 0 $dark-blue;
 }
 
 .draft-hero-ban {
