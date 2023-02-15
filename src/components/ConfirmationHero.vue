@@ -6,7 +6,7 @@
         :src="
           props.selectedHero
             ? require(`@/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`)
-            : require('@/assets/imgs/heroes/dota-placeholder.jpg')
+            : PLACEHOLDER
         "
         :alt="props.selectedHero ? props.selectedHero.localized_name : 'placeholder'"
       />
@@ -28,6 +28,7 @@ import { IHero } from '@/types';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import { EmitEvents } from '@/enum/emits';
+import { PLACEHOLDER } from '@/constants/images';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();

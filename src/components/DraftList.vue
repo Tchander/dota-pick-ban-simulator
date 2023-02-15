@@ -38,8 +38,8 @@
         </template>
         <img
           v-else
-          :src="require('@/assets/imgs/heroes/dota-placeholder.jpg')"
-          :alt="'placeholder'"
+          :src="PLACEHOLDER"
+          alt="placeholder"
           class="draft-hero-img draft-hero-img_ban"
         />
       </div>
@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
 import { IPlayer } from '@/types/player';
+import { PLACEHOLDER } from '@/constants/images';
 
 interface Props {
   player: IPlayer;
