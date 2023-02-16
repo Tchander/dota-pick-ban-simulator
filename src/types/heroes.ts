@@ -1,15 +1,17 @@
-import { HeroesRoles } from '@/enum/heroes';
+import { HeroesRoles, HeroesPrimaryAttribute } from '@/enum/heroes';
 
-export interface IHeroes {
+export interface IHero {
   id: number;
   name: string;
   localized_name: string;
-  primary_attr: string;
+  primary_attr: HeroesPrimaryAttribute;
   attack_type: string;
   roles: HeroesRoles[];
   legs: number;
+  isPicked?: boolean;
+  isBanned?: boolean;
 }
 
 export interface IHeroesState {
-  heroes: IHeroes[];
+  heroes: IHero[];
 }

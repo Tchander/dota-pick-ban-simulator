@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
-import { IHeroesState } from '@/types';
+import { IHero, IHeroesState } from '@/types';
 import { HEROES } from '@/constants/heroes';
+import { StoreId } from '@/enum/stores';
 
-export const useHeroesStore = defineStore('heroes', {
+export const useHeroesStore = defineStore(StoreId.HEROES, {
   state: (): IHeroesState => ({
     heroes: [],
   }),
@@ -13,6 +14,24 @@ export const useHeroesStore = defineStore('heroes', {
     // Пока что хардкод. В будущем реализовать логику запроса данных героев раз в месяц
     getHeroes() {
       this.heroes = HEROES;
+      this.heroes.forEach((hero: IHero) => {
+        hero.isPicked = false;
+        hero.isBanned = false;
+      });
+    },
+
+    heroPicked(pickedHero: IHero) {
+      const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
+      if (index !== -1) {
+        this.heroes[index].isPicked = true;
+      }
+    },
+
+    heroBanned(pickedHero: IHero) {
+      const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
+      if (index !== -1) {
+        this.heroes[index].isBanned = true;
+      }
     },
   },
 });
