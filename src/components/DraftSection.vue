@@ -1,5 +1,6 @@
 <template>
   <div class="section">
+    <ui-modal v-model="state.showSelectFirstPickModal"> </ui-modal>
     <div class="heroes-wrapper">
       <div class="heroes">
         <hero-list
@@ -32,15 +33,18 @@ import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
 import { IHero } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
+import UiModal from '@/components/UiModal.vue';
 
 interface State {
   selectedHero: IHero | null;
   isRadiantPickFirst: boolean;
+  showSelectFirstPickModal: boolean;
 }
 
 const state = reactive<State>({
   selectedHero: null,
   isRadiantPickFirst: true,
+  showSelectFirstPickModal: true,
 });
 
 const heroesStore = useHeroesStore();
