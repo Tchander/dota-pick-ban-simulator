@@ -29,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: EmitEvents.UPDATE): void;
+  (e: EmitEvents.CLICKED): void;
 }>();
 
 const refModal = ref<HTMLDivElement>();

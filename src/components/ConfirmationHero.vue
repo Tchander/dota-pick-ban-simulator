@@ -12,12 +12,8 @@
       />
     </div>
     <div class="confirmation-button-wrapper">
-      <div class="confirmation-button confirmation-button-pick" @click="confirmHeroPick">
-        PICK
-      </div>
-      <div class="confirmation-button confirmation-button-ban" @click="confirmHeroBan">
-        BAN
-      </div>
+      <ui-button @clicked="confirmHeroPick">PICK</ui-button>
+      <ui-button @clicked="confirmHeroBan">BAN</ui-button>
     </div>
   </div>
 </template>
@@ -29,6 +25,7 @@ import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
+import UiButton from '@/components/Ui/UiButton.vue';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
@@ -103,22 +100,5 @@ const confirmHeroBan = () => {
 .confirmation-button-wrapper {
   display: flex;
   gap: 20px;
-}
-
-.confirmation-button {
-  @include font(1.25, 1.75, 700);
-  padding: 1rem;
-  width: 100%;
-  background-color: $dark-blue;
-  color: $light-grey;
-  border: 1px solid $dark-blue;
-  border-radius: 0.5rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background-color: $dark-blue;
-  }
 }
 </style>

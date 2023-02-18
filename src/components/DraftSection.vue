@@ -1,6 +1,16 @@
 <template>
   <div class="section">
-    <ui-modal v-model="state.showSelectFirstPickModal"> </ui-modal>
+    <!--    <ui-modal v-model="state.showSelectFirstPickModal">-->
+    <!--      <div class="modal-title">Choose who will have the first pick?</div>-->
+    <!--      <div class="modal-buttons">-->
+    <!--        <ui-button class="modal-button" :background-color="'green'">RADIANT</ui-button>-->
+    <!--        <ui-button class="modal-button" :background-color="'red'">DIRE</ui-button>-->
+    <!--      </div>-->
+    <!--    </ui-modal>-->
+    <select-first-pick
+      v-model="state.showSelectFirstPickModal"
+      @clicked="firstPickChosen"
+    />
     <div class="heroes-wrapper">
       <div class="heroes">
         <hero-list
@@ -33,7 +43,7 @@ import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
 import { IHero } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
-import UiModal from '@/components/UiModal.vue';
+import SelectFirstPick from '@/components/SelectFirstPick.vue';
 
 interface State {
   selectedHero: IHero | null;
@@ -75,6 +85,11 @@ const resetSelectedHero = () => {
   state.selectedHero = null;
 };
 
+const firstPickChosen = (isRadiantFirstPick: boolean) => {
+  console.log(isRadiantFirstPick);
+  state.showSelectFirstPickModal = false;
+};
+
 const startGame = () => {};
 
 const init = () => {
@@ -94,6 +109,17 @@ onMounted(() => {
   max-width: 100%;
   padding: 0.6rem 2.4rem;
 }
+
+//.modal-title {
+//  @include font(2, 2.5, 700);
+//  color: $light-grey;
+//  margin-bottom: 8rem;
+//}
+//
+//.modal-buttons {
+//  display: flex;
+//  gap: 1rem;
+//}
 
 .heroes-wrapper {
   display: flex;
