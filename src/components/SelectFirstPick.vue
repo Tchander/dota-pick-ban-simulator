@@ -1,16 +1,16 @@
 <template>
-  <ui-modal>
+  <ui-modal v-bind="$attrs">
     <div class="modal-title">Choose who will have the first pick?</div>
     <div class="modal-buttons">
       <ui-button
         class="modal-button"
-        :background-color="'green'"
+        :background-color="Colors.GREEN"
         @clicked="firstPickChosen(true)"
         >RADIANT</ui-button
       >
       <ui-button
         class="modal-button"
-        :background-color="'red'"
+        :background-color="Colors.RED"
         @clicked="firstPickChosen(false)"
         >DIRE</ui-button
       >
@@ -22,6 +22,7 @@
 import UiModal from '@/components/Ui/UiModal.vue';
 import UiButton from '@/components/Ui/UiButton.vue';
 import { EmitEvents } from '@/enum/emits';
+import { Colors } from '@/enum/ui';
 
 const emit = defineEmits<{
   (e: EmitEvents.CLICKED, isRadiantFirstPick: boolean): void;

@@ -12,19 +12,20 @@
 
 <script setup lang="ts">
 import { EmitEvents } from '@/enum/emits';
+import { Colors } from '@/enum/ui';
 
 const emit = defineEmits<{
   (e: EmitEvents.CLICKED): void;
 }>();
 
 interface Props {
-  backgroundColor?: string;
-  color?: string;
+  backgroundColor?: Colors;
+  color?: Colors;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  backgroundColor: 'dark-blue',
-  color: 'light-grey',
+  backgroundColor: Colors.DARK_BLUE,
+  color: Colors.LIGHT_GREY,
 });
 
 const handleClick = () => {

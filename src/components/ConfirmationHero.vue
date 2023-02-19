@@ -12,64 +12,45 @@
       />
     </div>
     <div class="confirmation-button-wrapper">
-      <ui-button @clicked="confirmHeroPick">PICK</ui-button>
-      <ui-button @clicked="confirmHeroBan">BAN</ui-button>
+      <ui-button
+        :background-color="props.isPick ? Colors.GREEN : Colors.RED"
+        @clicked="heroClicked"
+        >{{ props.isPick ? 'PICK' : 'BAN' }}</ui-button
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
 import { IHero } from '@/types';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
 import UiButton from '@/components/Ui/UiButton.vue';
+import { Colors } from '@/enum/ui';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
 
 const emit = defineEmits<{
-  (e: EmitEvents.RESET): void;
+  (e: EmitEvents.CLICKED, hero: IHero | null): void;
 }>();
 
 interface Props {
-  selectedHero: IHero;
+  selectedHero: IHero | null;
+  isPick: boolean;
 }
 
 const props = defineProps<Props>();
 
-interface State {
-  currentPickNumber: number;
-  currentBanNumber: number;
-}
-
-const state = reactive<State>({
-  currentPickNumber: 0,
-  currentBanNumber: 0,
-});
-
-const confirmHeroPick = () => {
-  heroesStore.heroPicked(props.selectedHero);
-  playerStore.pickHero(
-    props.selectedHero,
-    playerStore.radiantPlayer,
-    state.currentPickNumber,
-  );
-  state.currentPickNumber++;
-  emit(EmitEvents.RESET);
-};
-
-const confirmHeroBan = () => {
-  heroesStore.heroBanned(props.selectedHero);
-  playerStore.banHero(
-    props.selectedHero,
-    playerStore.radiantPlayer,
-    state.currentBanNumber,
-  );
-  state.currentBanNumber++;
-  emit(EmitEvents.RESET);
+const heroClicked = () => {
+  if (props.isPick) {
+    heroesStore.heroPicked(props.selectedHero);
+  } else {
+    heroesStore.heroBanned(props.selectedHero);
+  }
+  emit(EmitEvents.CLICKED, props.selectedHero);
 };
 </script>
 

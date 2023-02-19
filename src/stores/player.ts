@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
-import { IPlayer, IPlayerState } from '@/types/player';
 import { StoreId } from '@/enum/stores';
-import { IHero } from '@/types';
+import { IHero, IPlayer, IPlayerState } from '@/types';
 import { DEFAULT_NUMBER_OF_BANS, DEFAULT_NUMBER_OF_PICKS } from '@/constants/numbers';
 
 export const usePlayerStore = defineStore(StoreId.PLAYER, {
@@ -23,20 +22,20 @@ export const usePlayerStore = defineStore(StoreId.PLAYER, {
   getters: {},
 
   actions: {
-    pickHero(hero: IHero, player: IPlayer, currentPickNumber: number) {
-      if (player.id === this.radiantPlayer.id) {
+    pickHero(hero: IHero | null, currentPickNumber: number, player?: IPlayer) {
+      if (player!.id === this.radiantPlayer.id) {
         this.radiantPlayer.pickedHeroes[currentPickNumber] = hero;
       }
-      if (player.id === this.direPlayer.id) {
+      if (player!.id === this.direPlayer.id) {
         this.direPlayer.pickedHeroes[currentPickNumber] = hero;
       }
     },
 
-    banHero(hero: IHero, player: IPlayer, currentBanNumber: number) {
-      if (player.id === this.radiantPlayer.id) {
+    banHero(hero: IHero | null, currentBanNumber: number, player?: IPlayer) {
+      if (player!.id === this.radiantPlayer.id) {
         this.radiantPlayer.bannedHeroes[currentBanNumber] = hero;
       }
-      if (player.id === this.direPlayer.id) {
+      if (player!.id === this.direPlayer.id) {
         this.direPlayer.bannedHeroes[currentBanNumber] = hero;
       }
     },

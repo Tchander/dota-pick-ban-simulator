@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { IPlayer } from '@/types/player';
+import { IPlayer } from '@/types';
 import { PLACEHOLDER } from '@/constants/images';
 
 interface Props {
