@@ -20,14 +20,14 @@ export const useHeroesStore = defineStore(StoreId.HEROES, {
       });
     },
 
-    heroPicked(pickedHero: IHero) {
+    heroPicked(pickedHero: IHero | null) {
       const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
       if (index !== -1) {
         this.heroes[index].isPicked = true;
       }
     },
 
-    heroBanned(pickedHero: IHero) {
+    heroBanned(pickedHero: IHero | null) {
       const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
       if (index !== -1) {
         this.heroes[index].isBanned = true;

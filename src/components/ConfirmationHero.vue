@@ -12,67 +12,45 @@
       />
     </div>
     <div class="confirmation-button-wrapper">
-      <div class="confirmation-button confirmation-button-pick" @click="confirmHeroPick">
-        PICK
-      </div>
-      <div class="confirmation-button confirmation-button-ban" @click="confirmHeroBan">
-        BAN
-      </div>
+      <ui-button
+        :background-color="props.isPick ? Colors.GREEN : Colors.RED"
+        @clicked="heroClicked"
+        >{{ props.isPick ? 'PICK' : 'BAN' }}</ui-button
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
 import { IHero } from '@/types';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
+import UiButton from '@/components/Ui/UiButton.vue';
+import { Colors } from '@/enum/ui';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
 
 const emit = defineEmits<{
-  (e: EmitEvents.RESET): void;
+  (e: EmitEvents.CLICKED, hero: IHero | null): void;
 }>();
 
 interface Props {
-  selectedHero: IHero;
+  selectedHero: IHero | null;
+  isPick: boolean;
 }
 
 const props = defineProps<Props>();
 
-interface State {
-  currentPickNumber: number;
-  currentBanNumber: number;
-}
-
-const state = reactive<State>({
-  currentPickNumber: 0,
-  currentBanNumber: 0,
-});
-
-const confirmHeroPick = () => {
-  heroesStore.heroPicked(props.selectedHero);
-  playerStore.pickHero(
-    props.selectedHero,
-    playerStore.radiantPlayer,
-    state.currentPickNumber,
-  );
-  state.currentPickNumber++;
-  emit(EmitEvents.RESET);
-};
-
-const confirmHeroBan = () => {
-  heroesStore.heroBanned(props.selectedHero);
-  playerStore.banHero(
-    props.selectedHero,
-    playerStore.radiantPlayer,
-    state.currentBanNumber,
-  );
-  state.currentBanNumber++;
-  emit(EmitEvents.RESET);
+const heroClicked = () => {
+  if (props.isPick) {
+    heroesStore.heroPicked(props.selectedHero);
+  } else {
+    heroesStore.heroBanned(props.selectedHero);
+  }
+  emit(EmitEvents.CLICKED, props.selectedHero);
 };
 </script>
 
@@ -103,22 +81,5 @@ const confirmHeroBan = () => {
 .confirmation-button-wrapper {
   display: flex;
   gap: 20px;
-}
-
-.confirmation-button {
-  @include font(1.25, 1.75, 700);
-  padding: 1rem;
-  width: 100%;
-  background-color: $dark-blue;
-  color: $light-grey;
-  border: 1px solid $dark-blue;
-  border-radius: 0.5rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background-color: $dark-blue;
-  }
 }
 </style>

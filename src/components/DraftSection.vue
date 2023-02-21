@@ -1,5 +1,9 @@
 <template>
   <div class="section">
+    <select-first-pick
+      v-model="state.showSelectFirstPickModal"
+      @clicked="firstPickChosen"
+    />
     <div class="heroes-wrapper">
       <div class="heroes">
         <hero-list
@@ -14,8 +18,9 @@
       </div>
       <confirmation-hero
         :selected-hero="state.selectedHero"
+        :is-pick="isPick"
         class="confirmation"
-        @reset="resetSelectedHero"
+        @clicked="heroChosen"
       />
     </div>
     <draft-info />
@@ -24,23 +29,36 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, computed } from 'vue';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import HeroList from '@/components/HeroList.vue';
 import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
-import { IHero } from '@/types';
+import SelectFirstPick from '@/components/SelectFirstPick.vue';
+import { IHero, IPlayer } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
+import {
+  PICK_ROUNDS,
+  FIRST_PICK_PICK_ROUNDS,
+  FIRST_PICK_BAN_ROUNDS,
+  ROUND_COUNTER_MAPPER,
+} from '@/constants/numbers';
 
 interface State {
   selectedHero: IHero | null;
-  isRadiantPickFirst: boolean;
+  showSelectFirstPickModal: boolean;
+  roundCounter: number;
+  firstPickPlayer?: IPlayer;
+  secondPickPlayer?: IPlayer;
 }
 
 const state = reactive<State>({
   selectedHero: null,
-  isRadiantPickFirst: true,
+  showSelectFirstPickModal: true,
+  roundCounter: 1,
+  firstPickPlayer: undefined,
+  secondPickPlayer: undefined,
 });
 
 const heroesStore = useHeroesStore();
@@ -52,6 +70,10 @@ const primaryAttributes = [
   HeroesPrimaryAttribute.AGILITY,
   HeroesPrimaryAttribute.INTELLIGENCE,
 ];
+
+const isPick = computed<boolean>(() => {
+  return PICK_ROUNDS.includes(state.roundCounter);
+});
 
 const heroesFilter = (attr: HeroesPrimaryAttribute) => {
   const result: IHero[] = heroes.value.filter((hero: IHero) => {
@@ -67,11 +89,44 @@ const changeSelectedHero = (hero: IHero) => {
   state.selectedHero = hero;
 };
 
-const resetSelectedHero = () => {
-  state.selectedHero = null;
+const firstPickChosen = (isRadiantFirstPick: boolean) => {
+  state.showSelectFirstPickModal = false;
+  if (isRadiantFirstPick) {
+    state.firstPickPlayer = playerStore.radiantPlayer;
+    state.secondPickPlayer = playerStore.direPlayer;
+  } else {
+    state.firstPickPlayer = playerStore.direPlayer;
+    state.secondPickPlayer = playerStore.radiantPlayer;
+  }
 };
 
-const startGame = () => {};
+const heroPicked = (hero: IHero | null) => {
+  const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
+  if (FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter)) {
+    playerStore.pickHero(hero, counter, state.firstPickPlayer);
+  } else {
+    playerStore.pickHero(hero, counter, state.secondPickPlayer);
+  }
+};
+
+const heroBanned = (hero: IHero | null) => {
+  const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
+  if (FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)) {
+    playerStore.banHero(hero, counter, state.firstPickPlayer);
+  } else {
+    playerStore.banHero(hero, counter, state.secondPickPlayer);
+  }
+};
+
+const heroChosen = (hero: IHero | null) => {
+  if (isPick.value) {
+    heroPicked(hero);
+  } else {
+    heroBanned(hero);
+  }
+  state.roundCounter++;
+  state.selectedHero = null;
+};
 
 const init = () => {
   playerStore.setNumberOfPickedHeroes();
