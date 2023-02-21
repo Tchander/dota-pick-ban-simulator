@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: EmitEvents.UPDATE): void;
+  (e: EmitEvents.UPDATE_MODEL_VALUE): void;
   (e: EmitEvents.CLICKED): void;
 }>();
 
@@ -39,7 +39,7 @@ function closeModal() {
     refModal.value.blur();
   }
 
-  emit(EmitEvents.UPDATE);
+  emit(EmitEvents.UPDATE_MODEL_VALUE);
 }
 </script>
 

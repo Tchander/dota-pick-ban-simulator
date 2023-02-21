@@ -1,4 +1,4 @@
 export const enum EmitEvents {
   CLICKED = 'clicked',
-  UPDATE = 'update:modelValue',
+  UPDATE_MODEL_VALUE = 'update:modelValue',
 }

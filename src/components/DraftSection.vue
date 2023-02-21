@@ -42,20 +42,13 @@ import {
   PICK_ROUNDS,
   FIRST_PICK_PICK_ROUNDS,
   FIRST_PICK_BAN_ROUNDS,
+  ROUND_COUNTER_MAPPER,
 } from '@/constants/numbers';
-
-interface IPickBanCounters {
-  roundCounter: number;
-  firstPickPickCounter: number;
-  firstPickBanCounter: number;
-  secondPickPickCounter: number;
-  secondPickBanCounter: number;
-}
 
 interface State {
   selectedHero: IHero | null;
   showSelectFirstPickModal: boolean;
-  pickBanCounters: IPickBanCounters;
+  roundCounter: number;
   firstPickPlayer?: IPlayer;
   secondPickPlayer?: IPlayer;
 }
@@ -63,13 +56,7 @@ interface State {
 const state = reactive<State>({
   selectedHero: null,
   showSelectFirstPickModal: true,
-  pickBanCounters: {
-    roundCounter: 1,
-    firstPickPickCounter: 0,
-    firstPickBanCounter: 0,
-    secondPickPickCounter: 0,
-    secondPickBanCounter: 0,
-  },
+  roundCounter: 1,
   firstPickPlayer: undefined,
   secondPickPlayer: undefined,
 });
@@ -85,7 +72,7 @@ const primaryAttributes = [
 ];
 
 const isPick = computed<boolean>(() => {
-  return PICK_ROUNDS.includes(state.pickBanCounters.roundCounter);
+  return PICK_ROUNDS.includes(state.roundCounter);
 });
 
 const heroesFilter = (attr: HeroesPrimaryAttribute) => {
@@ -113,39 +100,31 @@ const firstPickChosen = (isRadiantFirstPick: boolean) => {
   }
 };
 
+const heroPicked = (hero: IHero | null) => {
+  const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
+  if (FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter)) {
+    playerStore.pickHero(hero, counter, state.firstPickPlayer);
+  } else {
+    playerStore.pickHero(hero, counter, state.secondPickPlayer);
+  }
+};
+
+const heroBanned = (hero: IHero | null) => {
+  const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
+  if (FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)) {
+    playerStore.banHero(hero, counter, state.firstPickPlayer);
+  } else {
+    playerStore.banHero(hero, counter, state.secondPickPlayer);
+  }
+};
+
 const heroChosen = (hero: IHero | null) => {
   if (isPick.value) {
-    if (FIRST_PICK_PICK_ROUNDS.includes(state.pickBanCounters.roundCounter)) {
-      playerStore.pickHero(
-        hero,
-        state.pickBanCounters.firstPickPickCounter,
-        state.firstPickPlayer,
-      );
-      state.pickBanCounters.firstPickPickCounter++;
-    } else {
-      playerStore.pickHero(
-        hero,
-        state.pickBanCounters.secondPickPickCounter,
-        state.secondPickPlayer,
-      );
-      state.pickBanCounters.secondPickPickCounter++;
-    }
-  } else if (FIRST_PICK_BAN_ROUNDS.includes(state.pickBanCounters.roundCounter)) {
-    playerStore.banHero(
-      hero,
-      state.pickBanCounters.firstPickBanCounter,
-      state.firstPickPlayer,
-    );
-    state.pickBanCounters.firstPickBanCounter++;
+    heroPicked(hero);
   } else {
-    playerStore.banHero(
-      hero,
-      state.pickBanCounters.secondPickBanCounter,
-      state.secondPickPlayer,
-    );
-    state.pickBanCounters.secondPickBanCounter++;
+    heroBanned(hero);
   }
-  state.pickBanCounters.roundCounter++;
+  state.roundCounter++;
   state.selectedHero = null;
 };
 
