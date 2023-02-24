@@ -81,6 +81,7 @@ const handleClick = (hero: IHero) => {
     &:hover {
       scale: none;
       cursor: default;
+      border: none;
     }
   }
 
