@@ -19,7 +19,9 @@ export const usePlayerStore = defineStore(StoreId.PLAYER, {
     },
   }),
 
-  getters: {},
+  getters: {
+    // pass
+  },
 
   actions: {
     pickHero(hero: IHero | null, currentPickNumber: number, player?: IPlayer) {

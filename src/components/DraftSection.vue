@@ -1,9 +1,10 @@
 <template>
   <div class="section">
-    <select-first-pick
-      v-model="state.showSelectFirstPickModal"
-      @clicked="firstPickChosen"
-    />
+    <draft-settings v-model="state.showSelectFirstPickModal" @clicked="firstPickChosen" />
+    <!--    <select-first-pick-->
+    <!--      v-model="state.showSelectFirstPickModal"-->
+    <!--      @clicked="firstPickChosen"-->
+    <!--    />-->
     <div class="heroes-wrapper">
       <div class="heroes">
         <hero-list
@@ -44,6 +45,7 @@ import {
   FIRST_PICK_BAN_ROUNDS,
   ROUND_COUNTER_MAPPER,
 } from '@/constants/numbers';
+import DraftSettings from '@/components/DraftSettings.vue';
 
 interface State {
   selectedHero: IHero | null;

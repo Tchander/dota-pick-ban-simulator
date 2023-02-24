@@ -8,7 +8,9 @@ export const useHeroesStore = defineStore(StoreId.HEROES, {
     heroes: [],
   }),
 
-  getters: {},
+  getters: {
+    // pass
+  },
 
   actions: {
     // Пока что хардкод. В будущем реализовать логику запроса данных героев раз в месяц
