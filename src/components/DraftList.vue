@@ -26,7 +26,7 @@
         <template v-if="hero">
           <img
             v-if="hero"
-            :src="`/src/assets/imgs/heroes/${hero.localized_name}.webp`"
+            :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
           />
