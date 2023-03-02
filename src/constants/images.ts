@@ -1,1 +1,1 @@
-export const PLACEHOLDER = require('@/assets/imgs/heroes/dota-placeholder.jpg');
+export const PLACEHOLDER = 'src/assets/imgs/heroes/dota-placeholder.jpg';

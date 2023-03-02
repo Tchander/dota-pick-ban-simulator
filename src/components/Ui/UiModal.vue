@@ -1,18 +1,20 @@
 <template>
-  <teleport to="body">
-    <div v-if="props.modelValue" ref="modal" class="ui-modal">
-      <div class="ui-modal-backdrop" />
-      <div class="ui-modal-container">
-        <div class="ui-modal-container-inner">
-          <slot name="default">
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-          </slot>
+  <div>
+    <teleport to="body">
+      <div v-if="props.modelValue" ref="modal" class="ui-modal">
+        <div class="ui-modal-backdrop" />
+        <div class="ui-modal-container">
+          <div class="ui-modal-container-inner">
+            <slot name="default">
+              <p>Some contents...</p>
+              <p>Some contents...</p>
+              <p>Some contents...</p>
+            </slot>
+          </div>
         </div>
       </div>
-    </div>
-  </teleport>
+    </teleport>
+  </div>
 </template>
 
 <script lang="ts" setup>

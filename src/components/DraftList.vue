@@ -11,11 +11,7 @@
         class="draft-hero-pick"
       >
         <img
-          :src="
-            hero
-              ? require(`@/assets/imgs/heroes/${hero.localized_name}.webp`)
-              : require('@/assets/imgs/heroes/dota-placeholder.jpg')
-          "
+          :src="hero ? `src/assets/imgs/heroes/${hero.localized_name}.webp` : PLACEHOLDER"
           :alt="hero ? hero.localized_name : 'placeholder'"
           class="draft-hero-img draft-hero-img_pick"
         />
@@ -30,7 +26,7 @@
         <template v-if="hero">
           <img
             v-if="hero"
-            :src="require(`@/assets/imgs/heroes/${hero.localized_name}.webp`)"
+            :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
           />

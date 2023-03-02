@@ -5,7 +5,7 @@
         class="confirmation-image"
         :src="
           props.selectedHero
-            ? require(`@/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`)
+            ? `src/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`
             : PLACEHOLDER
         "
         :alt="props.selectedHero ? props.selectedHero.localized_name : 'placeholder'"
