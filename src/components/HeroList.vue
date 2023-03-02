@@ -14,7 +14,7 @@
         <img
           class="hero-img"
           :class="{ 'hero-img_disabled': hero.isPicked || hero.isBanned }"
-          :src="require(`@/assets/imgs/heroes/${hero.localized_name}.webp`)"
+          :src="`/src/assets/imgs/heroes/${hero.localized_name}.webp`"
           :alt="hero.localized_name"
           @click="handleClick(hero)"
         />
