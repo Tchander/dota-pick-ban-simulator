@@ -11,7 +11,7 @@
         class="draft-hero-pick"
       >
         <img
-          :src="hero ? `src/assets/imgs/heroes/${hero.localized_name}.webp` : PLACEHOLDER"
+          :src="hero ? getImageByName(`heroes/${hero.localized_name}.webp`) : PLACEHOLDER"
           :alt="hero ? hero.localized_name : 'placeholder'"
           class="draft-hero-img draft-hero-img_pick"
         />
@@ -26,7 +26,7 @@
         <template v-if="hero">
           <img
             v-if="hero"
-            :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
+            :src="getImageByName(`heroes/${hero.localized_name}.webp`)"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
           />
@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { IPlayer } from '@/types';
 import { PLACEHOLDER } from '@/constants/images';
+import { getImageByName } from '@/helpers';
 
 interface Props {
   player: IPlayer;
