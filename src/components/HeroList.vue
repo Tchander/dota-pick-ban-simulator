@@ -14,7 +14,7 @@
         <img
           class="hero-img"
           :class="{ 'hero-img_disabled': hero.isPicked || hero.isBanned }"
-          :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
+          :src="getImageByName(`heroes/${hero.localized_name}.webp`)"
           :alt="hero.localized_name"
           @click="handleClick(hero)"
         />
@@ -32,6 +32,7 @@ import { IHero } from '@/types';
 import { EmitEvents } from '@/enum/emits';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
 import { ATTRIBUTE_TITLE_MAPPER } from '@/constants/heroes';
+import { getImageByName } from '@/helpers';
 
 const emit = defineEmits<{
   (e: EmitEvents.CLICKED, hero: IHero): void;

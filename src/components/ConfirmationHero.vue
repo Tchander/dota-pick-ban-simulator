@@ -5,7 +5,7 @@
         class="confirmation-image"
         :src="
           props.selectedHero
-            ? `src/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`
+            ? getImageByName(`heroes/${props.selectedHero.localized_name}.webp`)
             : PLACEHOLDER
         "
         :alt="props.selectedHero ? props.selectedHero.localized_name : 'placeholder'"
@@ -29,6 +29,7 @@ import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
 import UiButton from '@/components/Ui/UiButton.vue';
 import { Colors } from '@/enum/ui';
+import { getImageByName } from '@/helpers';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
