@@ -1,10 +1,9 @@
 <template>
   <div class="section">
-    <draft-settings v-model="state.showSelectFirstPickModal" @clicked="firstPickChosen" />
-    <!--    <select-first-pick-->
-    <!--      v-model="state.showSelectFirstPickModal"-->
-    <!--      @clicked="firstPickChosen"-->
-    <!--    />-->
+    <draft-settings
+      v-model="state.showSelectFirstPickModal"
+      @clicked="settingsConfirmed"
+    />
     <div class="heroes-wrapper">
       <div class="heroes">
         <hero-list
@@ -30,13 +29,12 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, watch } from 'vue';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import HeroList from '@/components/HeroList.vue';
 import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
-import SelectFirstPick from '@/components/SelectFirstPick.vue';
 import { IHero, IPlayer } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
 import {
@@ -44,8 +42,12 @@ import {
   FIRST_PICK_PICK_ROUNDS,
   FIRST_PICK_BAN_ROUNDS,
   ROUND_COUNTER_MAPPER,
+  DEFAULT_NUMBER_OF_ROUNDS,
 } from '@/constants/numbers';
 import DraftSettings from '@/components/DraftSettings.vue';
+import { useConfigStore } from '@/stores/config';
+import { useTimerStore } from '@/stores/timer';
+import { TimerMapper } from '@/enum/timer';
 
 interface State {
   selectedHero: IHero | null;
@@ -65,6 +67,8 @@ const state = reactive<State>({
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
+const configStore = useConfigStore();
+const timerStore = useTimerStore();
 const { heroes } = storeToRefs(heroesStore);
 
 const primaryAttributes = [
@@ -88,12 +92,12 @@ const heroesFilter = (attr: HeroesPrimaryAttribute) => {
 };
 
 const changeSelectedHero = (hero: IHero) => {
+  if (state.roundCounter > DEFAULT_NUMBER_OF_ROUNDS) return;
   state.selectedHero = hero;
 };
 
-const firstPickChosen = (isRadiantFirstPick: boolean) => {
-  state.showSelectFirstPickModal = false;
-  if (isRadiantFirstPick) {
+const setTeamsByFirstPick = () => {
+  if (configStore.isRadiantFirstPick) {
     state.firstPickPlayer = playerStore.radiantPlayer;
     state.secondPickPlayer = playerStore.direPlayer;
   } else {
@@ -130,10 +134,94 @@ const heroChosen = (hero: IHero | null) => {
   state.selectedHero = null;
 };
 
+const timerStart = () => {
+  window.clearInterval(timerStore.radiantTimerInterval);
+  window.clearInterval(timerStore.direTimerInterval);
+  timerStore.setTimeByDefault(TimerMapper.RADIANT_MAIN_TIME);
+  timerStore.setTimeByDefault(TimerMapper.DIRE_MAIN_TIME);
+
+  if (state.roundCounter > DEFAULT_NUMBER_OF_ROUNDS) return;
+
+  if (
+    FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter) ||
+    FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)
+  ) {
+    if (configStore.isRadiantFirstPick) {
+      timerStore.radiantTimerInterval = window.setInterval(() => {
+        if (timerStore.radiantMainTime === 0) {
+          if (timerStore.radiantReserveTime === 0) {
+            heroChosen(null);
+          } else {
+            timerStore.decreaseTimer(TimerMapper.RADIANT_RESERVE_TIME);
+          }
+        } else {
+          timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
+        }
+      }, 1000);
+    } else {
+      timerStore.direTimerInterval = window.setInterval(() => {
+        if (timerStore.direMainTime === 0) {
+          if (timerStore.direReserveTime === 0) {
+            heroChosen(null);
+          } else {
+            timerStore.decreaseTimer(TimerMapper.DIRE_RESERVE_TIME);
+          }
+        } else {
+          timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
+        }
+      }, 1000);
+    }
+  } else if (configStore.isRadiantFirstPick) {
+    timerStore.direTimerInterval = window.setInterval(() => {
+      if (timerStore.direMainTime === 0) {
+        if (timerStore.direReserveTime === 0) {
+          heroChosen(null);
+        } else {
+          timerStore.decreaseTimer(TimerMapper.DIRE_RESERVE_TIME);
+        }
+      } else {
+        timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
+      }
+    }, 1000);
+  } else {
+    timerStore.radiantTimerInterval = window.setInterval(() => {
+      if (timerStore.radiantMainTime === 0) {
+        if (timerStore.radiantReserveTime === 0) {
+          heroChosen(null);
+        } else {
+          timerStore.decreaseTimer(TimerMapper.RADIANT_RESERVE_TIME);
+        }
+      } else {
+        timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
+      }
+    }, 1000);
+  }
+};
+
+const settingsConfirmed = (isRadiantFirstPick: boolean, isTimer: boolean) => {
+  state.showSelectFirstPickModal = false;
+  configStore.setIsRadiantFirstPick(isRadiantFirstPick);
+  configStore.setTimer(isTimer);
+  setTeamsByFirstPick();
+
+  if (configStore.isTimer) {
+    timerStart();
+  }
+};
+
 const init = () => {
   playerStore.setNumberOfPickedHeroes();
   playerStore.setNumberOfBannedHeroes();
 };
+
+watch(
+  () => state.roundCounter,
+  () => {
+    if (configStore.isTimer) {
+      timerStart();
+    }
+  },
+);
 
 onMounted(() => {
   init();

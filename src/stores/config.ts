@@ -10,5 +10,13 @@ export const useConfigStore = defineStore(StoreId.CONFIG, {
 
   getters: {},
 
-  actions: {},
+  actions: {
+    setTimer(isTimer: boolean) {
+      this.isTimer = isTimer;
+    },
+
+    setIsRadiantFirstPick(isRadiantFirstPick: boolean) {
+      this.isRadiantFirstPick = isRadiantFirstPick;
+    },
+  },
 });
