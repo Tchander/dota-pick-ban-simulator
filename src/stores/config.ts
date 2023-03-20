@@ -8,8 +8,6 @@ export const useConfigStore = defineStore(StoreId.CONFIG, {
     isTimer: false,
   }),
 
-  getters: {},
-
   actions: {
     setTimer(isTimer: boolean) {
       this.isTimer = isTimer;

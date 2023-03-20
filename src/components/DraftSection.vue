@@ -43,6 +43,7 @@ import {
   FIRST_PICK_BAN_ROUNDS,
   ROUND_COUNTER_MAPPER,
   DEFAULT_NUMBER_OF_ROUNDS,
+  ONE_SECOND,
 } from '@/constants/numbers';
 import DraftSettings from '@/components/DraftSettings.vue';
 import { useConfigStore } from '@/stores/config';
@@ -157,7 +158,7 @@ const timerStart = () => {
         } else {
           timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
         }
-      }, 1000);
+      }, ONE_SECOND);
     } else {
       timerStore.direTimerInterval = window.setInterval(() => {
         if (timerStore.direMainTime === 0) {
@@ -169,7 +170,7 @@ const timerStart = () => {
         } else {
           timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
         }
-      }, 1000);
+      }, ONE_SECOND);
     }
   } else if (configStore.isRadiantFirstPick) {
     timerStore.direTimerInterval = window.setInterval(() => {
@@ -182,7 +183,7 @@ const timerStart = () => {
       } else {
         timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
       }
-    }, 1000);
+    }, ONE_SECOND);
   } else {
     timerStore.radiantTimerInterval = window.setInterval(() => {
       if (timerStore.radiantMainTime === 0) {
@@ -194,7 +195,7 @@ const timerStart = () => {
       } else {
         timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
       }
-    }, 1000);
+    }, ONE_SECOND);
   }
 };
 
@@ -229,6 +230,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+
 .section {
   display: flex;
   flex-direction: column;

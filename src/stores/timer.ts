@@ -14,8 +14,6 @@ export const useTimerStore = defineStore(StoreId.TIMER, {
     direTimerInterval: undefined,
   }),
 
-  getters: {},
-
   actions: {
     setTimeByDefault(timer: TimerMapper) {
       switch (timer) {

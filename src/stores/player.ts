@@ -19,10 +19,6 @@ export const usePlayerStore = defineStore(StoreId.PLAYER, {
     },
   }),
 
-  getters: {
-    // pass
-  },
-
   actions: {
     pickHero(hero: IHero | null, currentPickNumber: number, player?: IPlayer) {
       if (player!.id === this.radiantPlayer.id) {

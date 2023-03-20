@@ -14,7 +14,7 @@
     <div class="confirmation-button-wrapper">
       <ui-button
         :background-color="props.isPick ? Colors.GREEN : Colors.RED"
-        :is-disabled="isButtonDisabled"
+        :is-disabled="!props.selectedHero"
         @clicked="heroClicked"
         >{{ props.isPick ? 'PICK' : 'BAN' }}</ui-button
       >
@@ -23,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { IHero } from '@/types';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
@@ -45,10 +44,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const isButtonDisabled = computed<boolean>(() => {
-  return !props.selectedHero;
-});
 
 const heroClicked = () => {
   if (props.isPick) {
