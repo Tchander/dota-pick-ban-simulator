@@ -49,6 +49,8 @@ import DraftSettings from '@/components/DraftSettings.vue';
 import { useConfigStore } from '@/stores/config';
 import { useTimerStore } from '@/stores/timer';
 import { TimerMapper } from '@/enum/timer';
+import { TeamList } from '@/enum/teams';
+import { ITimerState } from '@/types';
 
 interface State {
   selectedHero: IHero | null;
@@ -135,7 +137,57 @@ const heroChosen = (hero: IHero | null) => {
   state.selectedHero = null;
 };
 
-const timerStart = () => {
+const TEAM_TIMER_META_MAPPER = {
+  [TeamList.RADIANT]: {
+    mainTimeName: 'radiantMainTime',
+    reserveTimeName: 'radiantReserveTime',
+    decreaseReserveName: TimerMapper.RADIANT_RESERVE_TIME,
+    decreaseMainName: TimerMapper.RADIANT_MAIN_TIME,
+    timerName: 'radiantTimerInterval',
+  },
+  [TeamList.DIRE]: {
+    mainTimeName: 'direMainTime',
+    reserveTimeName: 'direReserveTime',
+    decreaseReserveName: TimerMapper.DIRE_RESERVE_TIME,
+    decreaseMainName: TimerMapper.DIRE_MAIN_TIME,
+    timerName: 'direTimerInterval',
+  },
+};
+const startIntervalTimerByType = (timerType: TeamList): number => {
+  const { mainTimeName, reserveTimeName, decreaseReserveName, decreaseMainName } =
+    TEAM_TIMER_META_MAPPER[timerType];
+
+  return window.setInterval(() => {
+    if (timerStore[mainTimeName as keyof ITimerState] === 0) {
+      if (timerStore[reserveTimeName as keyof ITimerState] === 0) {
+        heroChosen(null);
+        return;
+      }
+      timerStore.decreaseTimer(decreaseReserveName);
+      return;
+    }
+    timerStore.decreaseTimer(decreaseMainName);
+  }, ONE_SECOND);
+};
+
+const getCurrentTeamByRound = (): TeamList => {
+  if (
+    FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter) ||
+    FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)
+  ) {
+    if (configStore.isRadiantFirstPick) {
+      return TeamList.RADIANT;
+    }
+    return TeamList.DIRE;
+  }
+
+  if (configStore.isRadiantFirstPick) {
+    return TeamList.DIRE;
+  }
+  return TeamList.RADIANT;
+};
+
+const timerStart = (): void => {
   window.clearInterval(timerStore.radiantTimerInterval);
   window.clearInterval(timerStore.direTimerInterval);
   timerStore.setTimeByDefault(TimerMapper.RADIANT_MAIN_TIME);
@@ -143,60 +195,9 @@ const timerStart = () => {
 
   if (state.roundCounter > DEFAULT_NUMBER_OF_ROUNDS) return;
 
-  if (
-    FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter) ||
-    FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)
-  ) {
-    if (configStore.isRadiantFirstPick) {
-      timerStore.radiantTimerInterval = window.setInterval(() => {
-        if (timerStore.radiantMainTime === 0) {
-          if (timerStore.radiantReserveTime === 0) {
-            heroChosen(null);
-          } else {
-            timerStore.decreaseTimer(TimerMapper.RADIANT_RESERVE_TIME);
-          }
-        } else {
-          timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
-        }
-      }, ONE_SECOND);
-    } else {
-      timerStore.direTimerInterval = window.setInterval(() => {
-        if (timerStore.direMainTime === 0) {
-          if (timerStore.direReserveTime === 0) {
-            heroChosen(null);
-          } else {
-            timerStore.decreaseTimer(TimerMapper.DIRE_RESERVE_TIME);
-          }
-        } else {
-          timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
-        }
-      }, ONE_SECOND);
-    }
-  } else if (configStore.isRadiantFirstPick) {
-    timerStore.direTimerInterval = window.setInterval(() => {
-      if (timerStore.direMainTime === 0) {
-        if (timerStore.direReserveTime === 0) {
-          heroChosen(null);
-        } else {
-          timerStore.decreaseTimer(TimerMapper.DIRE_RESERVE_TIME);
-        }
-      } else {
-        timerStore.decreaseTimer(TimerMapper.DIRE_MAIN_TIME);
-      }
-    }, ONE_SECOND);
-  } else {
-    timerStore.radiantTimerInterval = window.setInterval(() => {
-      if (timerStore.radiantMainTime === 0) {
-        if (timerStore.radiantReserveTime === 0) {
-          heroChosen(null);
-        } else {
-          timerStore.decreaseTimer(TimerMapper.RADIANT_RESERVE_TIME);
-        }
-      } else {
-        timerStore.decreaseTimer(TimerMapper.RADIANT_MAIN_TIME);
-      }
-    }, ONE_SECOND);
-  }
+  const currentTeam: TeamList = getCurrentTeamByRound();
+  const { timerName } = TEAM_TIMER_META_MAPPER[currentTeam];
+  timerStore[timerName as keyof ITimerState] = startIntervalTimerByType(currentTeam);
 };
 
 const settingsConfirmed = (isRadiantFirstPick: boolean, isTimer: boolean) => {
