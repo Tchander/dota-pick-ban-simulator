@@ -1,0 +1,6 @@
+export enum TimerMapper {
+  RADIANT_MAIN_TIME,
+  DIRE_MAIN_TIME,
+  RADIANT_RESERVE_TIME,
+  DIRE_RESERVE_TIME,
+}

@@ -1,5 +1,7 @@
 import { HeroesRoles, HeroesPrimaryAttribute } from '@/enum/heroes';
 
+export type NoHero = string;
+
 export interface IHero {
   id: number;
   name: string;

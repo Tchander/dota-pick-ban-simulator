@@ -1,8 +1,12 @@
 <template>
   <div
     class="ui-button"
-    :class="[`background_${props.backgroundColor}`, `color_${props.color}`]"
-    @click="handleClick()"
+    :class="[
+      `background_${props.backgroundColor}`,
+      `color_${props.color}`,
+      { disabled: props.isDisabled },
+    ]"
+    @click="handleClick"
   >
     <slot name="default">
       <span>Click me</span>
@@ -21,6 +25,7 @@ const emit = defineEmits<{
 interface Props {
   backgroundColor?: Colors;
   color?: Colors;
+  isDisabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +33,11 @@ const props = withDefaults(defineProps<Props>(), {
   color: Colors.LIGHT_GREY,
 });
 
-const handleClick = () => {
+const handleClick = (e: Event) => {
+  if (props.isDisabled) {
+    e.preventDefault();
+    return;
+  }
   emit(EmitEvents.CLICKED);
 };
 </script>
@@ -78,6 +87,18 @@ const handleClick = () => {
 .color {
   &_light-grey {
     color: $light-grey;
+  }
+}
+
+.disabled {
+  background: $light-grey;
+  border: 1px solid $light-grey;
+  color: $white;
+  cursor: default;
+
+  &:hover {
+    background-color: $light-grey;
+    border: 1px solid $light-grey;
   }
 }
 </style>

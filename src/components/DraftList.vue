@@ -2,7 +2,14 @@
   <div class="draft">
     <div class="draft-top-block">
       <div class="draft-player-name">{{ props.player.name }}</div>
-      <div class="draft-timer"></div>
+      <div v-if="isTimer" class="draft-timer">
+        <div class="draft-reserve-time">
+          Reserve time: <span class="draft-time">{{ transformTime(reserveTime) }}</span>
+        </div>
+        <div class="draft-main-time">
+          Main time: <span class="draft-time">{{ transformTime(mainTime) }}</span>
+        </div>
+      </div>
     </div>
     <div class="draft-wrapper">
       <div
@@ -11,8 +18,12 @@
         class="draft-hero-pick"
       >
         <img
-          :src="hero ? getImageByName(`heroes/${hero.localized_name}.webp`) : PLACEHOLDER"
-          :alt="hero ? hero.localized_name : 'placeholder'"
+          :src="
+            hero !== NO_HERO
+              ? getImageByName(`heroes/${hero.localized_name}.webp`)
+              : PLACEHOLDER
+          "
+          :alt="hero !== NO_HERO ? hero.localized_name : 'placeholder'"
           class="draft-hero-img draft-hero-img_pick"
         />
       </div>
@@ -23,9 +34,8 @@
         :key="`${idx}${props.player.id}banned`"
         class="draft-hero-ban"
       >
-        <template v-if="hero">
+        <template v-if="hero !== NO_HERO">
           <img
-            v-if="hero"
             :src="getImageByName(`heroes/${hero.localized_name}.webp`)"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
@@ -44,15 +54,45 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useTimerStore } from '@/stores/timer';
+import { useConfigStore } from '@/stores/config';
 import { IPlayer } from '@/types';
 import { PLACEHOLDER } from '@/constants/images';
+import { SECONDS_IN_MINUTE } from '@/constants/numbers';
+import { NO_HERO } from '@/constants/heroes';
+import { TeamList } from '@/enum/teams';
 import { getImageByName } from '@/helpers';
+
+const configStore = useConfigStore();
+const timerStore = useTimerStore();
+const { radiantMainTime, radiantReserveTime, direMainTime, direReserveTime } =
+  storeToRefs(timerStore);
+const { isTimer } = storeToRefs(configStore);
 
 interface Props {
   player: IPlayer;
+  team: TeamList;
 }
 
 const props = defineProps<Props>();
+
+const reserveTime = computed<number>(() => {
+  if (props.team !== TeamList.RADIANT) return direReserveTime.value;
+  return radiantReserveTime.value;
+});
+
+const mainTime = computed<number>(() => {
+  if (props.team !== TeamList.RADIANT) return direMainTime.value;
+  return radiantMainTime.value;
+});
+
+const transformTime = (time: number) => {
+  const integer = Math.floor(time / SECONDS_IN_MINUTE);
+  const fractional = Math.floor(time % SECONDS_IN_MINUTE);
+  return `${integer}:${fractional >= 10 ? fractional : `0${fractional}`}`;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -72,6 +112,23 @@ const props = defineProps<Props>();
 }
 
 .draft-player-name {
+  @include font(2, 3, 700);
+}
+
+.draft-timer {
+  display: flex;
+  gap: 2rem;
+}
+
+.draft-reserve-time {
+  @include font(1.5, 2.25, 400);
+}
+
+.draft-main-time {
+  @include font(1.5, 2.25, 400);
+}
+
+.draft-time {
   @include font(2, 3, 700);
 }
 

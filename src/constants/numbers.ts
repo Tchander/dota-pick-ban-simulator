@@ -32,3 +32,7 @@ export const ROUND_COUNTER_MAPPER: { [key: number]: number } = {
   23: 4,
   24: 4,
 };
+export const MAIN_TIME_DEFAULT = 30;
+export const RESERVE_TIME_DEFAULT = 130;
+export const SECONDS_IN_MINUTE = 60;
+export const ONE_SECOND = 1000;

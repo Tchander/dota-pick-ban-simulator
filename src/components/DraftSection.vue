@@ -1,8 +1,8 @@
 <template>
   <div class="section">
-    <select-first-pick
+    <draft-settings
       v-model="state.showSelectFirstPickModal"
-      @clicked="firstPickChosen"
+      @clicked="settingsConfirmed"
     />
     <div class="heroes-wrapper">
       <div class="heroes">
@@ -29,24 +29,31 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, watch } from 'vue';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
 import HeroList from '@/components/HeroList.vue';
 import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
-import SelectFirstPick from '@/components/SelectFirstPick.vue';
-import { IHero, IPlayer } from '@/types';
+import DraftSettings from '@/components/DraftSettings.vue';
+import { IHero, IPlayer, ITimerState, NoHero } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
 import {
   PICK_ROUNDS,
   FIRST_PICK_PICK_ROUNDS,
   FIRST_PICK_BAN_ROUNDS,
   ROUND_COUNTER_MAPPER,
+  DEFAULT_NUMBER_OF_ROUNDS,
+  ONE_SECOND,
 } from '@/constants/numbers';
+import { NO_HERO } from '@/constants/heroes';
+import { useConfigStore } from '@/stores/config';
+import { useTimerStore } from '@/stores/timer';
+import { TimerMapper } from '@/enum/timer';
+import { TeamList } from '@/enum/teams';
 
 interface State {
-  selectedHero: IHero | null;
+  selectedHero: IHero | NoHero;
   showSelectFirstPickModal: boolean;
   roundCounter: number;
   firstPickPlayer?: IPlayer;
@@ -54,7 +61,7 @@ interface State {
 }
 
 const state = reactive<State>({
-  selectedHero: null,
+  selectedHero: NO_HERO,
   showSelectFirstPickModal: true,
   roundCounter: 1,
   firstPickPlayer: undefined,
@@ -63,6 +70,8 @@ const state = reactive<State>({
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
+const configStore = useConfigStore();
+const timerStore = useTimerStore();
 const { heroes } = storeToRefs(heroesStore);
 
 const primaryAttributes = [
@@ -86,12 +95,12 @@ const heroesFilter = (attr: HeroesPrimaryAttribute) => {
 };
 
 const changeSelectedHero = (hero: IHero) => {
+  if (state.roundCounter > DEFAULT_NUMBER_OF_ROUNDS) return;
   state.selectedHero = hero;
 };
 
-const firstPickChosen = (isRadiantFirstPick: boolean) => {
-  state.showSelectFirstPickModal = false;
-  if (isRadiantFirstPick) {
+const setTeamsByFirstPick = () => {
+  if (configStore.isRadiantFirstPick) {
     state.firstPickPlayer = playerStore.radiantPlayer;
     state.secondPickPlayer = playerStore.direPlayer;
   } else {
@@ -100,7 +109,7 @@ const firstPickChosen = (isRadiantFirstPick: boolean) => {
   }
 };
 
-const heroPicked = (hero: IHero | null) => {
+const heroPicked = (hero: IHero | NoHero) => {
   const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
   if (FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter)) {
     playerStore.pickHero(hero, counter, state.firstPickPlayer);
@@ -109,7 +118,7 @@ const heroPicked = (hero: IHero | null) => {
   }
 };
 
-const heroBanned = (hero: IHero | null) => {
+const heroBanned = (hero: IHero | NoHero) => {
   const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
   if (FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)) {
     playerStore.banHero(hero, counter, state.firstPickPlayer);
@@ -118,20 +127,103 @@ const heroBanned = (hero: IHero | null) => {
   }
 };
 
-const heroChosen = (hero: IHero | null) => {
+const heroChosen = (hero: IHero | NoHero) => {
   if (isPick.value) {
     heroPicked(hero);
   } else {
     heroBanned(hero);
   }
   state.roundCounter++;
-  state.selectedHero = null;
+  state.selectedHero = NO_HERO;
+};
+
+const TEAM_TIMER_META_MAPPER = {
+  [TeamList.RADIANT]: {
+    mainTimeName: 'radiantMainTime',
+    reserveTimeName: 'radiantReserveTime',
+    decreaseReserveName: TimerMapper.RADIANT_RESERVE_TIME,
+    decreaseMainName: TimerMapper.RADIANT_MAIN_TIME,
+    timerName: 'radiantTimerInterval',
+  },
+  [TeamList.DIRE]: {
+    mainTimeName: 'direMainTime',
+    reserveTimeName: 'direReserveTime',
+    decreaseReserveName: TimerMapper.DIRE_RESERVE_TIME,
+    decreaseMainName: TimerMapper.DIRE_MAIN_TIME,
+    timerName: 'direTimerInterval',
+  },
+};
+const startIntervalTimerByType = (timerType: TeamList): number => {
+  const { mainTimeName, reserveTimeName, decreaseReserveName, decreaseMainName } =
+    TEAM_TIMER_META_MAPPER[timerType];
+
+  return window.setInterval(() => {
+    if (timerStore[mainTimeName as keyof ITimerState] === 0) {
+      if (timerStore[reserveTimeName as keyof ITimerState] === 0) {
+        heroChosen(NO_HERO);
+        return;
+      }
+      timerStore.decreaseTimer(decreaseReserveName);
+      return;
+    }
+    timerStore.decreaseTimer(decreaseMainName);
+  }, ONE_SECOND);
+};
+
+const getCurrentTeamByRound = (): TeamList => {
+  if (
+    FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter) ||
+    FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)
+  ) {
+    if (configStore.isRadiantFirstPick) {
+      return TeamList.RADIANT;
+    }
+    return TeamList.DIRE;
+  }
+
+  if (configStore.isRadiantFirstPick) {
+    return TeamList.DIRE;
+  }
+  return TeamList.RADIANT;
+};
+
+const timerStart = (): void => {
+  window.clearInterval(timerStore.radiantTimerInterval);
+  window.clearInterval(timerStore.direTimerInterval);
+  timerStore.setTimeByDefault(TimerMapper.RADIANT_MAIN_TIME);
+  timerStore.setTimeByDefault(TimerMapper.DIRE_MAIN_TIME);
+
+  if (state.roundCounter > DEFAULT_NUMBER_OF_ROUNDS) return;
+
+  const currentTeam: TeamList = getCurrentTeamByRound();
+  const { timerName } = TEAM_TIMER_META_MAPPER[currentTeam];
+  timerStore[timerName as keyof ITimerState] = startIntervalTimerByType(currentTeam);
+};
+
+const settingsConfirmed = (isRadiantFirstPick: boolean, isTimer: boolean) => {
+  state.showSelectFirstPickModal = false;
+  configStore.setIsRadiantFirstPick(isRadiantFirstPick);
+  configStore.setTimer(isTimer);
+  setTeamsByFirstPick();
+
+  if (configStore.isTimer) {
+    timerStart();
+  }
 };
 
 const init = () => {
   playerStore.setNumberOfPickedHeroes();
   playerStore.setNumberOfBannedHeroes();
 };
+
+watch(
+  () => state.roundCounter,
+  () => {
+    if (configStore.isTimer) {
+      timerStart();
+    }
+  },
+);
 
 onMounted(() => {
   init();
