@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { IHero, IHeroesState } from '@/types';
+import {IHero, IHeroesState, NoHero} from '@/types';
 import { HEROES } from '@/constants/heroes';
 import { StoreId } from '@/enum/stores';
 
@@ -22,14 +22,14 @@ export const useHeroesStore = defineStore(StoreId.HEROES, {
       });
     },
 
-    heroPicked(pickedHero: IHero | null) {
+    heroPicked(pickedHero: IHero | NoHero) {
       const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
       if (index !== -1) {
         this.heroes[index].isPicked = true;
       }
     },
 
-    heroBanned(pickedHero: IHero | null) {
+    heroBanned(pickedHero: IHero | NoHero) {
       const index = this.heroes.findIndex((hero: IHero) => pickedHero === hero);
       if (index !== -1) {
         this.heroes[index].isBanned = true;

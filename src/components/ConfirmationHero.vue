@@ -4,17 +4,21 @@
       <img
         class="confirmation-image"
         :src="
-          props.selectedHero
+          props.selectedHero !== NO_HERO
             ? `src/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`
             : PLACEHOLDER
         "
-        :alt="props.selectedHero ? props.selectedHero.localized_name : 'placeholder'"
+        :alt="
+          props.selectedHero !== NO_HERO
+            ? props.selectedHero.localized_name
+            : 'placeholder'
+        "
       />
     </div>
     <div class="confirmation-button-wrapper">
       <ui-button
         :background-color="props.isPick ? Colors.GREEN : Colors.RED"
-        :is-disabled="!props.selectedHero"
+        :is-disabled="props.selectedHero === NO_HERO"
         @clicked="heroClicked"
         >{{ props.isPick ? 'PICK' : 'BAN' }}</ui-button
       >
@@ -23,23 +27,24 @@
 </template>
 
 <script setup lang="ts">
-import { IHero } from '@/types';
+import { IHero, NoHero } from '@/types';
 import { useHeroesStore } from '@/stores/heroes';
 import { usePlayerStore } from '@/stores/player';
+import UiButton from '@/components/Ui/UiButton.vue';
 import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
-import UiButton from '@/components/Ui/UiButton.vue';
+import { NO_HERO } from '@/constants/heroes';
 import { Colors } from '@/enum/ui';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();
 
 const emit = defineEmits<{
-  (e: EmitEvents.CLICKED, hero: IHero | null): void;
+  (e: EmitEvents.CLICKED, hero: IHero | NoHero): void;
 }>();
 
 interface Props {
-  selectedHero: IHero | null;
+  selectedHero: IHero | NoHero;
   isPick: boolean;
 }
 

@@ -18,8 +18,12 @@
         class="draft-hero-pick"
       >
         <img
-          :src="hero ? `src/assets/imgs/heroes/${hero.localized_name}.webp` : PLACEHOLDER"
-          :alt="hero ? hero.localized_name : 'placeholder'"
+          :src="
+            hero !== NO_HERO
+              ? `src/assets/imgs/heroes/${hero.localized_name}.webp`
+              : PLACEHOLDER
+          "
+          :alt="hero !== NO_HERO ? hero.localized_name : 'placeholder'"
           class="draft-hero-img draft-hero-img_pick"
         />
       </div>
@@ -30,9 +34,8 @@
         :key="`${idx}${props.player.id}banned`"
         class="draft-hero-ban"
       >
-        <template v-if="hero">
+        <template v-if="hero !== NO_HERO">
           <img
-            v-if="hero"
             :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
@@ -58,6 +61,7 @@ import { useConfigStore } from '@/stores/config';
 import { IPlayer } from '@/types';
 import { PLACEHOLDER } from '@/constants/images';
 import { SECONDS_IN_MINUTE } from '@/constants/numbers';
+import { NO_HERO } from '@/constants/heroes';
 import { TeamList } from '@/enum/teams';
 
 const configStore = useConfigStore();

@@ -35,7 +35,8 @@ import { usePlayerStore } from '@/stores/player';
 import HeroList from '@/components/HeroList.vue';
 import ConfirmationHero from '@/components/ConfirmationHero.vue';
 import DraftInfo from '@/components/DraftInfo.vue';
-import { IHero, IPlayer } from '@/types';
+import DraftSettings from '@/components/DraftSettings.vue';
+import { IHero, IPlayer, ITimerState, NoHero } from '@/types';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
 import {
   PICK_ROUNDS,
@@ -45,15 +46,14 @@ import {
   DEFAULT_NUMBER_OF_ROUNDS,
   ONE_SECOND,
 } from '@/constants/numbers';
-import DraftSettings from '@/components/DraftSettings.vue';
+import { NO_HERO } from '@/constants/heroes';
 import { useConfigStore } from '@/stores/config';
 import { useTimerStore } from '@/stores/timer';
 import { TimerMapper } from '@/enum/timer';
 import { TeamList } from '@/enum/teams';
-import { ITimerState } from '@/types';
 
 interface State {
-  selectedHero: IHero | null;
+  selectedHero: IHero | NoHero;
   showSelectFirstPickModal: boolean;
   roundCounter: number;
   firstPickPlayer?: IPlayer;
@@ -61,7 +61,7 @@ interface State {
 }
 
 const state = reactive<State>({
-  selectedHero: null,
+  selectedHero: NO_HERO,
   showSelectFirstPickModal: true,
   roundCounter: 1,
   firstPickPlayer: undefined,
@@ -109,7 +109,7 @@ const setTeamsByFirstPick = () => {
   }
 };
 
-const heroPicked = (hero: IHero | null) => {
+const heroPicked = (hero: IHero | NoHero) => {
   const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
   if (FIRST_PICK_PICK_ROUNDS.includes(state.roundCounter)) {
     playerStore.pickHero(hero, counter, state.firstPickPlayer);
@@ -118,7 +118,7 @@ const heroPicked = (hero: IHero | null) => {
   }
 };
 
-const heroBanned = (hero: IHero | null) => {
+const heroBanned = (hero: IHero | NoHero) => {
   const counter = ROUND_COUNTER_MAPPER[state.roundCounter];
   if (FIRST_PICK_BAN_ROUNDS.includes(state.roundCounter)) {
     playerStore.banHero(hero, counter, state.firstPickPlayer);
@@ -127,14 +127,14 @@ const heroBanned = (hero: IHero | null) => {
   }
 };
 
-const heroChosen = (hero: IHero | null) => {
+const heroChosen = (hero: IHero | NoHero) => {
   if (isPick.value) {
     heroPicked(hero);
   } else {
     heroBanned(hero);
   }
   state.roundCounter++;
-  state.selectedHero = null;
+  state.selectedHero = NO_HERO;
 };
 
 const TEAM_TIMER_META_MAPPER = {
@@ -160,7 +160,7 @@ const startIntervalTimerByType = (timerType: TeamList): number => {
   return window.setInterval(() => {
     if (timerStore[mainTimeName as keyof ITimerState] === 0) {
       if (timerStore[reserveTimeName as keyof ITimerState] === 0) {
-        heroChosen(null);
+        heroChosen(NO_HERO);
         return;
       }
       timerStore.decreaseTimer(decreaseReserveName);
@@ -231,7 +231,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-
 .section {
   display: flex;
   flex-direction: column;

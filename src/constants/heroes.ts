@@ -7,6 +7,8 @@ export const ATTRIBUTE_TITLE_MAPPER = {
   [HeroesPrimaryAttribute.INTELLIGENCE]: 'Intelligence',
 };
 
+export const NO_HERO = 'noHero';
+
 export const HEROES: IHero[] = [
   {
     id: 1,

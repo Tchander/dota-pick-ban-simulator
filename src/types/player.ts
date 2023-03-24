@@ -1,10 +1,10 @@
-import { IHero } from '@/types/heroes';
+import { IHero, NoHero } from '@/types/heroes';
 
 export interface IPlayer {
   id: number;
   name: string;
-  pickedHeroes: (IHero | null)[];
-  bannedHeroes: (IHero | null)[];
+  pickedHeroes: (IHero | NoHero)[];
+  bannedHeroes: (IHero | NoHero)[];
 }
 
 export interface IPlayerState {

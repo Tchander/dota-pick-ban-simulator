@@ -8,7 +8,10 @@
         class="hero"
         :class="[
           { hero_disabled: hero.isPicked || hero.isBanned },
-          { hero_active: props.selectedHero ? props.selectedHero.id === hero.id : '' },
+          {
+            hero_active:
+              props.selectedHero !== NO_HERO ? props.selectedHero.id === hero.id : '',
+          },
         ]"
       >
         <img
@@ -28,10 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { IHero } from '@/types';
+import type { IHero, NoHero } from '@/types';
 import { EmitEvents } from '@/enum/emits';
 import { HeroesPrimaryAttribute } from '@/enum/heroes';
-import { ATTRIBUTE_TITLE_MAPPER } from '@/constants/heroes';
+import { ATTRIBUTE_TITLE_MAPPER, NO_HERO } from '@/constants/heroes';
 
 const emit = defineEmits<{
   (e: EmitEvents.CLICKED, hero: IHero): void;
@@ -40,7 +43,7 @@ const emit = defineEmits<{
 interface Props {
   heroes: IHero[];
   attributeTitle: HeroesPrimaryAttribute;
-  selectedHero: IHero | null;
+  selectedHero: IHero | NoHero;
 }
 
 const props = defineProps<Props>();
