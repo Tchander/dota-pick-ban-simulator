@@ -5,7 +5,7 @@
         class="confirmation-image"
         :src="
           props.selectedHero !== NO_HERO
-            ? `src/assets/imgs/heroes/${props.selectedHero.localized_name}.webp`
+            ? getImageByName(`heroes/${props.selectedHero.localized_name}.webp`)
             : PLACEHOLDER
         "
         :alt="
@@ -35,6 +35,7 @@ import { EmitEvents } from '@/enum/emits';
 import { PLACEHOLDER } from '@/constants/images';
 import { NO_HERO } from '@/constants/heroes';
 import { Colors } from '@/enum/ui';
+import { getImageByName } from '@/helpers';
 
 const heroesStore = useHeroesStore();
 const playerStore = usePlayerStore();

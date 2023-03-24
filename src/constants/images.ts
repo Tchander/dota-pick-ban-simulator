@@ -1,1 +1,3 @@
-export const PLACEHOLDER = 'src/assets/imgs/heroes/dota-placeholder.jpg';
+import { getImageByName } from '@/helpers';
+
+export const PLACEHOLDER = getImageByName('heroes/dota-placeholder.jpg');

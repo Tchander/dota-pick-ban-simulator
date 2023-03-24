@@ -20,7 +20,7 @@
         <img
           :src="
             hero !== NO_HERO
-              ? `src/assets/imgs/heroes/${hero.localized_name}.webp`
+              ? getImageByName(`heroes/${hero.localized_name}.webp`)
               : PLACEHOLDER
           "
           :alt="hero !== NO_HERO ? hero.localized_name : 'placeholder'"
@@ -36,7 +36,7 @@
       >
         <template v-if="hero !== NO_HERO">
           <img
-            :src="`src/assets/imgs/heroes/${hero.localized_name}.webp`"
+            :src="getImageByName(`heroes/${hero.localized_name}.webp`)"
             :alt="hero.localized_name"
             class="draft-hero-img draft-hero-img_ban"
           />
@@ -63,6 +63,7 @@ import { PLACEHOLDER } from '@/constants/images';
 import { SECONDS_IN_MINUTE } from '@/constants/numbers';
 import { NO_HERO } from '@/constants/heroes';
 import { TeamList } from '@/enum/teams';
+import { getImageByName } from '@/helpers';
 
 const configStore = useConfigStore();
 const timerStore = useTimerStore();
